@@ -1,5 +1,5 @@
 #stage 1: Build
-FROM maven:3.9.12-amazoncorretto-25 AS build
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # cache dependencies
@@ -11,8 +11,11 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 #Stage 2: Runtime
-FROM amazoncorretto:25
+FROM eclipse-temurin:21-jre
 WORKDIR /app
+
+# needed for the docker-compose healthcheck
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
 #Copy the jar
 COPY --from=build /app/target/*.jar app.jar
